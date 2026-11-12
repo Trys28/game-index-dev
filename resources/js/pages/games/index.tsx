@@ -42,8 +42,10 @@ export default function Index({ games }: { games: Game[] }) {
 
     // TODO 2: laat alleen games zien waarvan de titel de zoektekst bevat.
     const visibleGames = games.filter((game) =>
+        (!game.completed || !onlyViewCompleted) &&
         game.title.toLowerCase().includes(search.trim().toLowerCase())
     );
+    
     // TODO 3: tel alle uitgespeelde games, onafhankelijk van de zoektekst.
     const completedCount = games.filter((game) => game.completed).length;
 
@@ -63,7 +65,7 @@ export default function Index({ games }: { games: Game[] }) {
                 <p className="gb-kicker">MIJN COLLECTIE</p>
                 <h1>Game Backlog</h1>
                 <p>Track je gaming progressie!.</p>
-                <p className="gb-total">{completedCount} van {games.length} uitgespeeld</p>
+                <p className="gb-total">{completedCount} van {visibleGames.length} uitgespeeld</p>
                 <label><input type='checkbox' checked={onlyViewCompleted} onChange={(e) => {setOnlyViewCompleted(!onlyViewCompleted);}} /> Alleen todo zien </label>
             </header>
             <section className="gb-panel">
