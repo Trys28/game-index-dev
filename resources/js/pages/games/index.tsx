@@ -2,6 +2,7 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import '../../../css/game-backlog.css';
+import { Label } from '@radix-ui/react-dropdown-menu';
 
 type Game = {
     id: number;
@@ -36,12 +37,15 @@ function GameCard({ game }: { game: Game }) {
 
 export default function Index({ games }: { games: Game[] }) {
     const [search, setSearch] = useState('');
+    const [onlyViewCompleted, setOnlyViewCompleted] = useState(false);
     const form = useForm({ title: '', platform: 'PC' });
 
     // TODO 2: laat alleen games zien waarvan de titel de zoektekst bevat.
     const visibleGames = games.filter((game) =>
+        (!game.completed || !onlyViewCompleted) &&
         game.title.toLowerCase().includes(search.trim().toLowerCase())
     );
+    
     // TODO 3: tel alle uitgespeelde games, onafhankelijk van de zoektekst.
     const completedCount = games.filter((game) => game.completed).length;
 
@@ -62,6 +66,7 @@ export default function Index({ games }: { games: Game[] }) {
                 <h1>Game Backlog</h1>
                 <p>Track je gaming progressie!.</p>
                 <p className="gb-total">{completedCount} van {visibleGames.length} uitgespeeld</p>
+                <label><input type='checkbox' checked={onlyViewCompleted} onChange={(e) => {setOnlyViewCompleted(!onlyViewCompleted);}} /> Alleen todo zien </label>
             </header>
             <section className="gb-panel">
                 <h2>Game toevoegen</h2>
@@ -104,9 +109,22 @@ export default function Index({ games }: { games: Game[] }) {
                 ) : visibleGames.length === 0 ? (
                     <p className="gb-empty">Geen games gevonden. Probeer een andere zoektekst.</p>
                 ) : (
-                    <div className="gb-grid">
-                        {visibleGames.map((game) => <GameCard key={game.id} game={game} />)}
-                    </div>
+                    onlyViewCompleted === true ? (
+                        <div className="gb-grid">
+                            {
+                            visibleGames
+                            .filter((game) => (!game.completed))
+                            .map((game) => <GameCard key={game.id} game={game} />)
+                            }
+                        </div>
+                    ) : (
+                        <div className="gb-grid">
+                            {
+                            visibleGames
+                            .map((game) => <GameCard key={game.id} game={game} />)
+                            }
+                        </div>
+                    )
                 )}
             </section>
         </div>
